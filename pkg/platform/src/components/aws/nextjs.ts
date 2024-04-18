@@ -336,6 +336,7 @@ export interface NextjsArgs extends SsrSiteArgs {
      */
     memory?: Size;
   };
+  vpc?: SsrSiteArgs["vpc"];
 }
 
 /**
@@ -782,6 +783,21 @@ export class Nextjs extends Component implements Link.Linkable {
                         revalidationTableArn,
                         `${revalidationTableArn}/*`,
                       ],
+                    },
+                  ]
+                : []),
+              // allow lambda to connect to vpc/subnets
+              ...(args.vpc
+                ? [
+                    {
+                      actions: [
+                        "ec2:DescribeNetworkInterfaces",
+                        "ec2:CreateNetworkInterface",
+                        "ec2:DeleteNetworkInterface",
+                        "ec2:DescribeInstances",
+                        "ec2:AttachNetworkInterface",
+                      ],
+                      resources: ["*"],
                     },
                   ]
                 : []),
